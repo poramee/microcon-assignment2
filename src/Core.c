@@ -2,8 +2,8 @@
 #ifndef PARAMS_DEFAULT
 #define PARAMS_DEFAULT
 DisplayParams DisplayParams_Default = {
-.currentScreen=Idle,
-//.currentScreen=Timer,
+//.currentScreen=Idle,
+.currentScreen=Stopwatch,
 .prevScreen=Idle,
 .forceUpdateScreen=1,
 .brightness=50,

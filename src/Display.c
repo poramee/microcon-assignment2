@@ -46,7 +46,7 @@ struct {
 
 /* LOGICS  --------------------------------------------*/
 void updateScreen(){
-	HAL_Delay(100);
+	HAL_Delay(50);
 	ILI9341_Fill_Screen(Color.background);
 	displayParamsPtr -> forceUpdateScreen = 1;
 }
@@ -157,6 +157,11 @@ void Draw_BottomNavBar(Rect *alarmTarget, Rect *timerTarget, Rect *stopwatchTarg
 		ILI9341_Draw_Filled_Rectangle_Coord(timerTarget -> x + 5,timerTarget -> y + timerTarget -> height - 5, timerTarget -> x + timerTarget -> width - 5,timerTarget -> y + timerTarget -> height, color);
 	}
 	Draw_Button(timerTarget -> x + timerTarget -> width,200,"Stopwatch", 2, WHITE, Color.accent, stopwatchTarget);
+	if(deviceParamsPtr -> Stopwatch_status != inactive){
+		uint16_t color = Color.active;
+		if(deviceParamsPtr -> Stopwatch_status == pause) color = Color.warning;
+		ILI9341_Draw_Filled_Rectangle_Coord(stopwatchTarget -> x + 5,stopwatchTarget -> y + stopwatchTarget -> height - 5, stopwatchTarget -> x + stopwatchTarget -> width - 5,stopwatchTarget -> y + stopwatchTarget -> height, color);
+	}
 }
 
 void Draw_TopBar(char title[],Rect *backBtnTarget){
@@ -451,7 +456,89 @@ void Timer_Page(){
 	}
 }
 
+uint8_t StopwatchSubpage=0;
+Time prevStopwatch = {0,0,0};
+void Stopwatch_Page(){
+	if(displayParamsPtr -> forceUpdateScreen){
+		Draw_TopBar("STOPWATCH", &targetRect[0]);
+		
+		if(deviceParamsPtr -> Stopwatch_status == inactive){
+			Draw_Button(40,150,"   START   ",3,WHITE,Color.active,&targetRect[1]);
+			StopwatchSubpage = 0;
+		}
+		else if(deviceParamsPtr -> Stopwatch_status == active){
+			Draw_Button(40,150,"RESET",2,WHITE,Color.accent,&targetRect[1]);
+			Draw_Button(196,150,"PAUSE",2,WHITE,Color.warning,&targetRect[2]);
+			StopwatchSubpage = 1;
+		}
+		else if(deviceParamsPtr -> Stopwatch_status == pause){
+			Draw_Button(40,150,"RESET",2,WHITE,Color.accent,&targetRect[1]);
+			Draw_Button(184 ,150,"RESUME",2,WHITE,Color.active,&targetRect[2]);
+			StopwatchSubpage = 2;
+		}
+	}
+	
+	if( prevStopwatch.hour != deviceParamsPtr -> Stopwatch_time.hour ||
+			prevStopwatch.min != deviceParamsPtr -> Stopwatch_time.min ||
+			prevStopwatch.sec != deviceParamsPtr -> Stopwatch_time.sec ||
+			displayParamsPtr -> forceUpdateScreen){
+					Draw_Custom_Clock_Sec(40,70,deviceParamsPtr -> Stopwatch_time,5, Color.foreground, Color.background);
+	}
 
+	updateScreenComplete();
+	//debugRect(targetRect[1]);
+	int touchOnTarget = checkTouchPadTarget(targetRect,3);
+	
+	
+	if(touchOnTarget == 0){
+		changePage(Clock);
+	}
+	else{
+		if(StopwatchSubpage == 0){
+			switch(touchOnTarget){
+				case 1:
+					Stopwatch_Start();
+					updateScreen();
+					break;
+				default:
+					break;
+			}
+		}
+		else if(StopwatchSubpage == 1){
+			switch(touchOnTarget){
+				case 1:
+					Stopwatch_Reset();
+					updateScreen();
+					break;
+				case 2:
+					Stopwatch_Pause();
+					updateScreen();
+				default:
+					break;
+			}
+		}
+		else if(StopwatchSubpage == 2){
+			switch(touchOnTarget){
+				case 1:
+					Stopwatch_Reset();
+					updateScreen();
+					break;
+				case 2:
+					Stopwatch_Start();
+					updateScreen();
+					break;
+				default:
+					break;
+			}
+		}
+	}
+}
+
+
+
+
+
+/* POP-UP PAGES  -------------------------------------------------*/
 
 void AlarmPopup_Page(){
 	if(isClockUpdated(2) || displayParamsPtr -> forceUpdateScreen){
@@ -520,6 +607,9 @@ void displayScreen(){
 			break;
 		case Timer:
 			Timer_Page();
+			break;
+		case Stopwatch:
+			Stopwatch_Page();
 			break;
 		case AlarmPopup:
 			AlarmPopup_Page();

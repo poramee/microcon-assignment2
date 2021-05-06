@@ -130,9 +130,10 @@ int main(void)
     /* USER CODE BEGIN 3 */
 		displayScreen();
 		
-		checkMainClock(&count2);
+		checkMainClock();
 		checkAlarmClock();
-		updateTimer(count4);
+		updateTimer();
+		updateStopwatch();
   }
   /* USER CODE END 3 */
 }

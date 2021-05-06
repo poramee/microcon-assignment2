@@ -32,11 +32,16 @@ typedef struct{
 	uint8_t userBrightness;
 }DeviceParams;
 
-void checkMainClock(uint32_t *counter);
+void checkMainClock(void );
 void checkAlarmClock(void );
 void UART_Log(char str[]);
 void Timer_Start(void );
 void Timer_Pause(void );
 void Timer_Reset(void );
-void updateTimer(uint32_t counter);
+void updateTimer(void );
+
+void Stopwatch_Start(void );
+void Stopwatch_Pause(void );
+void Stopwatch_Reset(void );
+void updateStopwatch(void );
 
