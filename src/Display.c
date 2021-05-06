@@ -64,6 +64,9 @@ int checkTouchPadTarget(Rect targetArea[], int arraySize){
 	if(TP_Touchpad_Pressed()){	
 		uint16_t position_array[2];
 		if(TP_Read_Coordinates(position_array) == TOUCHPAD_DATA_OK){
+			char str[10];
+			sprintf(str,"%d %d",position_array[0], position_array[1]);
+			UART_Log(str);
 			for(int i = 0;i < arraySize;++i){
 				uint16_t x0 = 240 - targetArea[i].y;
 				uint16_t y0 = targetArea[i].x;
@@ -197,6 +200,10 @@ void Draw_TopButton(char title[],uint8_t isActive,Rect *btnTarget){
 	Rect returnRect = {(CHAR_WIDTH*2) * (26 - strlen(title)),0,(CHAR_WIDTH*2) * (24),10 + (CHAR_HEIGHT*2)};
 	*btnTarget = returnRect;
 }
+
+
+
+
 
 /* PAGES  -------------------------------------------------*/
 
@@ -486,7 +493,6 @@ void Stopwatch_Page(){
 	}
 
 	updateScreenComplete();
-	//debugRect(targetRect[1]);
 	int touchOnTarget = checkTouchPadTarget(targetRect,3);
 	
 	
@@ -534,6 +540,57 @@ void Stopwatch_Page(){
 	}
 }
 
+void Settings_Page(){
+	if(displayParamsPtr -> forceUpdateScreen){
+		Draw_TopBar("SETTINGS", &targetRect[0]);
+		
+		// TIME
+		ILI9341_Draw_Text("TIME",10,54,Color.foreground,2,Color.background);
+		Draw_Clock(200,50,3,Color.foreground,Color.editable);
+		Rect adjustClockHour = {200,50,36,24};
+		Rect adjustClockMin = {254,50,36,24};
+		
+		// BRIGHTNESS
+		ILI9341_Draw_Text("BRIGHTNESS",10,100,Color.foreground,2,Color.background);
+		char brStr[5];
+		sprintf(brStr,"%3d %%", deviceParamsPtr -> userBrightness);
+		ILI9341_Draw_Text(brStr,200,96,Color.foreground,3,Color.editable);
+		Rect adjustBrightness = {200,96,90,24};
+		
+		targetRect[1] = adjustClockHour;
+		targetRect[2] = adjustClockMin;
+		targetRect[3] = adjustBrightness;
+	}
+	if(isClockUpdated(2)) Draw_Clock(200,50,3,Color.foreground,Color.editable);
+	
+	updateScreenComplete();
+	
+	switch(checkTouchPadTarget(targetRect, 4)){
+		case 0:
+			changePage(Home);
+			break;
+		case 1:
+			deviceParamsPtr -> currentTime.hour++;
+			deviceParamsPtr -> currentTime.hour %= 24;
+			updateScreen();
+			break;
+		case 2:
+			deviceParamsPtr -> currentTime.min++;
+			deviceParamsPtr -> currentTime.min %= 60;
+			updateScreen();
+			break;
+		case 3:
+			deviceParamsPtr -> userBrightness += 10;
+			if(deviceParamsPtr -> userBrightness > 100) deviceParamsPtr -> userBrightness = 10;
+			setBrightness(deviceParamsPtr -> userBrightness);
+			updateScreen();
+			break;
+		default:
+			break;
+	}
+					
+	
+}
 
 
 
@@ -610,6 +667,9 @@ void displayScreen(){
 			break;
 		case Stopwatch:
 			Stopwatch_Page();
+			break;
+		case Settings:
+			Settings_Page();
 			break;
 		case AlarmPopup:
 			AlarmPopup_Page();
