@@ -118,6 +118,20 @@ int isSleeping(){
 	return isSleeping;
 }
 
+void textWraping(char line1[], char line2[], char original[]){
+	int length = strlen(original);
+	char str[10];
+	sprintf(str,"%d", length);
+	UART_Log(str);
+	if(length <= 11){
+		sprintf(line1,"%s",original);
+	}
+	else{
+		sprintf(line1,"%.11s...",original);
+	}
+	sprintf(line2,"");
+}
+
 /* COMPONENTS  --------------------------------------------*/
 void debugRect(Rect rect){
 	ILI9341_Draw_Hollow_Rectangle_Coord(rect.x,rect.y,rect.x + rect.width, rect.y + rect.height, BLUE);
@@ -603,7 +617,17 @@ void Settings_Page(){
 
 void Music_Page(){
 	if(displayParamsPtr -> forceUpdateScreen){
+		
 		Draw_TopBar("MUSIC", &targetRect[0]);
+		
+		char songNameLine[2][50];
+		
+		textWraping(songNameLine[0], songNameLine[1], deviceParamsPtr -> Music.songName);
+		
+		
+		ILI9341_Draw_Text(songNameLine[0], 50, 70, Color.foreground, 3 , Color.background);
+		
+		
 		int playButtonX = 106 - (deviceParamsPtr -> Music.status == active? 9: 0);
 		Draw_Button(playButtonX,150,(deviceParamsPtr -> Music.status == active? "PAUSE": "PLAY"), 3, WHITE, Color.accent, &targetRect[1]);
 		Draw_Button(38,158,"<<", 2, WHITE, BLACK, &targetRect[2]);

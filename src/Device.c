@@ -114,7 +114,7 @@ void updateStopwatch(){
 }
 
 void Music_Load(){
-	
+	sprintf(deviceParamsPtr -> Music.songName,"Hello Test 1234");
 }
 
 void Music_Play(){
@@ -136,7 +136,6 @@ void Music_Stop(){
 	
 	
 	deviceParamsPtr -> Music.status = inactive;
-	
 }
 
 void Music_Next(){

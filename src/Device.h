@@ -19,6 +19,7 @@ typedef struct{
 
 typedef struct{
 	Status status;
+	char songName[100];
 	int currentSong;
 	int totalSongs;
 } MusicStatus;
