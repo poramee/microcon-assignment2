@@ -592,6 +592,37 @@ void Settings_Page(){
 	
 }
 
+void Music_Page(){
+	if(displayParamsPtr -> forceUpdateScreen){
+		Draw_TopBar("MUSIC", &targetRect[0]);
+		int playButtonX = 106 - (deviceParamsPtr -> Music.status == active? 9: 0);
+		Draw_Button(playButtonX,150,(deviceParamsPtr -> Music.status == active? "PAUSE": "PLAY"), 3, WHITE, Color.accent, &targetRect[1]);
+		Draw_Button(38,158,"<<", 2, WHITE, BLACK, &targetRect[2]);
+		Draw_Button(234,158,">>", 2, WHITE, BLACK, &targetRect[3]);
+	}
+	
+	updateScreenComplete();
+	switch(checkTouchPadTarget(targetRect, 4)){
+		case 0:
+			changePage(Home);
+			break;
+		case 1:
+			deviceParamsPtr -> Music.status == active? Music_Pause() : Music_Play();
+			updateScreen();
+			break;
+		case 2:
+			Music_Prev();
+			updateScreen();
+			break;
+		case 3:
+			Music_Next();
+			updateScreen();
+			break;
+		default:
+			break;
+	}
+}
+
 
 
 
@@ -667,6 +698,9 @@ void displayScreen(){
 			break;
 		case Stopwatch:
 			Stopwatch_Page();
+			break;
+		case Music:
+			Music_Page();
 			break;
 		case Settings:
 			Settings_Page();

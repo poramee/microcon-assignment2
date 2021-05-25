@@ -103,3 +103,43 @@ void updateStopwatch(){
 		deviceParamsPtr -> Stopwatch_time.sec =(count3/1000)-(count3/60000*60);
 	}
 }
+
+void Music_Load(){
+	
+}
+
+void Music_Play(){
+	// TODO: Play Music Algorithm
+	if(deviceParamsPtr -> Music.status == inactive) Music_Load(); // Maybe?
+	
+	deviceParamsPtr -> Music.status = active;
+}
+
+void Music_Pause(){
+	// TODO: Pause Music Algorithm
+	
+	
+	deviceParamsPtr -> Music.status = pause;
+}
+
+void Music_Stop(){
+	// TODO: Stop Music Algorithm
+	
+	
+	deviceParamsPtr -> Music.status = inactive;
+	
+}
+
+void Music_Next(){
+	
+	
+}
+
+void Music_Prev(){
+	
+	
+}
+
+void Accelerometer_Read(){
+	
+}

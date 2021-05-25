@@ -16,6 +16,12 @@ typedef struct{
 	int sec;
 } Time;
 
+typedef struct{
+	Status status;
+	int currentSong;
+	int totalSongs;
+} MusicStatus;
+
 
 typedef struct{
 	Time currentTime;
@@ -28,6 +34,8 @@ typedef struct{
 	
 	Status Stopwatch_status;
 	Time Stopwatch_time;
+	
+	MusicStatus Music;
 	
 	uint8_t userBrightness;
 }DeviceParams;
@@ -45,3 +53,12 @@ void Stopwatch_Pause(void );
 void Stopwatch_Reset(void );
 void updateStopwatch(void );
 
+
+void Music_Load(void );
+void Music_Play(void );
+void Music_Pause(void );
+void Music_Stop(void );
+void Music_Next(void );
+void Music_Prev(void );
+
+int Accelerometer_Read(void );
