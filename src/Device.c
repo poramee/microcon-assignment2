@@ -165,4 +165,5 @@ void checkAutoSleepWake(){
 		UART_Log("Sleep");
 		deviceParamsPtr -> isIdle = 1;
 	}
+	deviceParamsPtr -> isIdle = 0; // Test Only
 }

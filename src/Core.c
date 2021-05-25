@@ -20,7 +20,7 @@ DeviceParams DeviceParams_Default = {
 };
 #endif
 
-#ifndef PARAMS_PTR`
+#ifndef PARAMS_PTR
 #define PARAMS_PTR
 DeviceParams* deviceParamsPtr;
 DisplayParams* displayParamsPtr;

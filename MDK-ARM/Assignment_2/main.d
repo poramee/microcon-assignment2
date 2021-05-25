@@ -27,6 +27,7 @@ assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_flash.h
 assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_flash_ex.h
 assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_i2c.h
 assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_i2c_ex.h
+assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_i2s.h
 assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr.h
 assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr_ex.h
 assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rng.h
@@ -36,7 +37,16 @@ assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim.h
 assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h
 assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h
 assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h
+assignment_2\main.o: ../FATFS/App/fatfs.h
+assignment_2\main.o: ../Middlewares/Third_Party/FatFs/src/ff.h
+assignment_2\main.o: ../Middlewares/Third_Party/FatFs/src/integer.h
+assignment_2\main.o: ../FATFS/Target/ffconf.h
+assignment_2\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+assignment_2\main.o: ../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h
+assignment_2\main.o: ../Middlewares/Third_Party/FatFs/src/diskio.h
+assignment_2\main.o: ../FATFS/Target/user_diskio.h
 assignment_2\main.o: ../Core/Inc/i2c.h
+assignment_2\main.o: ../Core/Inc/i2s.h
 assignment_2\main.o: ../Core/Inc/rng.h
 assignment_2\main.o: ../Core/Inc/spi.h
 assignment_2\main.o: ../Core/Inc/tim.h
@@ -46,3 +56,5 @@ assignment_2\main.o: ..\src\Core.h
 assignment_2\main.o: ..\src\Device.h
 assignment_2\main.o: ..\MPU6050\mpu6050.h
 assignment_2\main.o: ..\src\Display.h
+assignment_2\main.o: ..\SD Card\fatfs_sd.h
+assignment_2\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

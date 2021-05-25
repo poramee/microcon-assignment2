@@ -26,6 +26,7 @@ assignment_2\stm32f7xx_hal_tim.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_
 assignment_2\stm32f7xx_hal_tim.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_flash_ex.h
 assignment_2\stm32f7xx_hal_tim.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_i2c.h
 assignment_2\stm32f7xx_hal_tim.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_i2c_ex.h
+assignment_2\stm32f7xx_hal_tim.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_i2s.h
 assignment_2\stm32f7xx_hal_tim.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr.h
 assignment_2\stm32f7xx_hal_tim.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr_ex.h
 assignment_2\stm32f7xx_hal_tim.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rng.h
