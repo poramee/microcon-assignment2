@@ -1,6 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 #include "main.h"
+#include "mpu6050.h"
 #endif
 
 typedef enum{
@@ -24,6 +25,8 @@ typedef struct{
 
 
 typedef struct{
+	int isIdle;
+	
 	Time currentTime;
 	
 	Status Alarm_status;
@@ -38,7 +41,11 @@ typedef struct{
 	MusicStatus Music;
 	
 	uint8_t userBrightness;
+	
+	MPU6050_t Accelerometer;
 }DeviceParams;
+
+void Device_Init(void );
 
 void checkMainClock(void );
 void checkAlarmClock(void );
@@ -61,4 +68,5 @@ void Music_Stop(void );
 void Music_Next(void );
 void Music_Prev(void );
 
-int Accelerometer_Read(void );
+void Accelerometer_Read(void );
+void checkAutoSleepWake(void );

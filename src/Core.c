@@ -3,13 +3,13 @@
 #define PARAMS_DEFAULT
 DisplayParams DisplayParams_Default = {
 .currentScreen=Idle,
-//.currentScreen=Settings,
 .prevScreen=Idle,
 .forceUpdateScreen=1,
 .brightness=50,
 };
 
 DeviceParams DeviceParams_Default = {
+.isIdle=0,
 .currentTime={0,0,0},
 .Alarm_status=inactive,
 .Alarm_time={0,0,0},
@@ -33,5 +33,6 @@ void Core_Init(DeviceParams* devicePtr,DisplayParams* displayPtr){
 	deviceParamsPtr = devicePtr;
 	displayParamsPtr = displayPtr;
 	Display_Init();
+	Device_Init();
 }
 

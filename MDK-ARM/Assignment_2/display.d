@@ -38,6 +38,8 @@ assignment_2\display.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim.h
 assignment_2\display.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h
 assignment_2\display.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h
 assignment_2\display.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h
+assignment_2\display.o: ..\MPU6050\mpu6050.h
+assignment_2\display.o: ../Core/Inc/i2c.h
 assignment_2\display.o: ..\ILI9341\ILI9341_GFX.h
 assignment_2\display.o: ..\ILI9341\ILI9341_STM32_Driver.h
 assignment_2\display.o: ..\ILI9341\ILI9341_Touchscreen.h

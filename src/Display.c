@@ -21,6 +21,8 @@ uint8_t prevDrawHour;
 uint8_t prevDrawMin;
 uint8_t prevDrawSec;
 
+int prevIsIdle = 1;
+
 /* COLOR PALETTE  -------------------------------------*/
 struct {
 	uint16_t foreground;
@@ -102,6 +104,18 @@ void setBrightness(uint8_t newBrightness){
 
 uint8_t isClockUpdated(uint8_t resolution){ // 1 = hour, 2 = hour + min, 3 = hour + min + sec
 	return (prevDrawHour != deviceParamsPtr -> currentTime.hour && resolution == 1) || (prevDrawMin != deviceParamsPtr -> currentTime.min && resolution == 2) || (prevDrawSec != deviceParamsPtr -> currentTime.sec && resolution == 3);
+}
+
+int isWaking(){
+	int isWaking = prevIsIdle == 1 && deviceParamsPtr -> isIdle == 0;
+	if(isWaking) prevIsIdle = deviceParamsPtr -> isIdle;
+	return isWaking;
+}
+
+int isSleeping(){
+	int isSleeping = prevIsIdle == 0 && deviceParamsPtr -> isIdle == 1;
+	if(isSleeping) prevIsIdle = deviceParamsPtr -> isIdle;
+	return isSleeping;
 }
 
 /* COMPONENTS  --------------------------------------------*/
@@ -213,11 +227,6 @@ void Idle_Page(){
 		Draw_Clock(75,90, 6, Color.foreground, Color.background);
 	}
 	updateScreenComplete();
-	Rect target = {0,0,320,240};
-	if(checkTouchPadTarget(&target,1) == 0){
-		setBrightness(deviceParamsPtr -> userBrightness);
-		changePage(Home);
-	}
 }
 
 void Home_Page(){
@@ -673,6 +682,8 @@ void Display_Init(){
 	setBrightness(deviceParamsPtr -> userBrightness);
 }
 
+
+
 void displayScreen(){
 	if(deviceParamsPtr -> Alarm_status == done && displayParamsPtr -> currentScreen != AlarmPopup && displayParamsPtr -> currentScreen != TimerPopup){
 		changePage(AlarmPopup);
@@ -680,6 +691,14 @@ void displayScreen(){
 	if(deviceParamsPtr -> Timer_status == done && displayParamsPtr -> currentScreen != TimerPopup && displayParamsPtr -> currentScreen != AlarmPopup){
 		changePage(TimerPopup);
 	}
+	
+	if(isWaking()){
+		setBrightness(deviceParamsPtr -> userBrightness);
+		changePage(Home);
+	}
+	else if(isSleeping()) changePage(Idle);
+	
+	
 	switch(displayParamsPtr -> currentScreen){
 		case Idle:
 			Idle_Page();

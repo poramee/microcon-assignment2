@@ -1,15 +1,24 @@
 #include "Device.h"
+#include <stdio.h>
 #include <string.h>
 
 /* VARIABLES  ---------------------------------------------*/
 extern DeviceParams* deviceParamsPtr;
 extern UART_HandleTypeDef huart3;
+extern I2C_HandleTypeDef hi2c1;
 
 extern uint32_t count2;
 extern uint32_t count3;
 extern uint32_t count4;
 
 Time Clear_Time = {0,0,0};
+
+/* INIT FUNCTION  ------------------------------------------*/
+
+
+void Device_Init(){
+	while (MPU6050_Init(&hi2c1) == 1);
+}
 
 /* FUNCTIONS  ---------------------------------------------*/
 void UART_Log(char str[]){
@@ -46,7 +55,7 @@ void checkAlarmClock(){
 		}
 	}
 }
-#include <stdio.h>
+
 
 void Timer_Start(){
 	deviceParamsPtr -> Timer_status = active;
@@ -141,5 +150,20 @@ void Music_Prev(){
 }
 
 void Accelerometer_Read(){
-	
+	MPU6050_Read_All(&hi2c1, &(deviceParamsPtr -> Accelerometer));
+	char str[50];
+	sprintf(str,"%lf", deviceParamsPtr -> Accelerometer.KalmanAngleX);
+	// UART_Log(str);
+}
+
+void checkAutoSleepWake(){
+	Accelerometer_Read();
+	if(deviceParamsPtr -> isIdle && deviceParamsPtr -> Accelerometer.KalmanAngleX >= 50){
+		UART_Log("Wake");
+		deviceParamsPtr -> isIdle = 0;
+	}
+	else if(!(deviceParamsPtr -> isIdle) && deviceParamsPtr -> Accelerometer.KalmanAngleX <= 30){
+		UART_Log("Sleep");
+		deviceParamsPtr -> isIdle = 1;
+	}
 }

@@ -36,6 +36,7 @@ assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim.h
 assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_tim_ex.h
 assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h
 assignment_2\main.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h
+assignment_2\main.o: ../Core/Inc/i2c.h
 assignment_2\main.o: ../Core/Inc/rng.h
 assignment_2\main.o: ../Core/Inc/spi.h
 assignment_2\main.o: ../Core/Inc/tim.h
@@ -43,4 +44,5 @@ assignment_2\main.o: ../Core/Inc/usart.h
 assignment_2\main.o: ../Core/Inc/gpio.h
 assignment_2\main.o: ..\src\Core.h
 assignment_2\main.o: ..\src\Device.h
+assignment_2\main.o: ..\MPU6050\mpu6050.h
 assignment_2\main.o: ..\src\Display.h
