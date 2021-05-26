@@ -229,6 +229,7 @@ int playMusic() {
 		fres = f_close(&fil);
 		if(fres == FR_OK) {
 			UART_Log("end music and close file complete.");
+			Music_Next(); // Play Next Song
 		}
 		else if(fres != FR_OK) {
 			sprintf(tmp_txt, "f_close() failed, res = %d\r\n", fres);
@@ -241,8 +242,6 @@ int playMusic() {
 
 
 /* INIT FUNCTION  ------------------------------------------*/
-
-
 void Device_Init(){
 	while (MPU6050_Init(&hi2c1) == 1);
 	initSDCARD();
@@ -341,6 +340,17 @@ void updateStopwatch(){
 	}
 }
 
+
+// Music
+// Private Functions
+void Music_Mute(){
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET);
+}
+void Music_UnMute(){
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+}
+
+// Public Functions
 void Music_FunctionLoop(){
 	if(deviceParamsPtr -> Music.status == active) playMusic();
 }
@@ -351,40 +361,42 @@ void Music_Load(){
 }
 
 void Music_Play(){
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+	Music_UnMute();
 	
 	if(deviceParamsPtr -> Music.status == inactive) Music_Load();
 	deviceParamsPtr -> Music.status = active;
 }
 
 void Music_Pause(){
-	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET);
+	Music_Mute();
 	
 	deviceParamsPtr -> Music.status = pause;
 }
 
 void Music_Stop(){
-	// TODO: Stop Music Algorithm
 	
+	Music_Mute();
 	
-	deviceParamsPtr -> Music.status = inactive;
-}
-
-void Music_Next(){
-	deviceParamsPtr -> Music.currentSong++;
 	f_close(&fil);
 	signal_play_buff = NULL;
 	signal_read_buff = NULL;
 	for(int i = 0;i < 4096;++i){
 		signal_buff1[i] = signal_buff2[i] = 0;
 	}
-	Music_Load();
+	
+	deviceParamsPtr -> Music.status = inactive;
+}
+
+void Music_Next(){
+	Music_Stop();
+	deviceParamsPtr -> Music.currentSong++;
+	Music_Play();
 }
 
 void Music_Prev(){
+	Music_Stop();
 	if(deviceParamsPtr -> Music.currentSong > 0) deviceParamsPtr -> Music.currentSong--;
-	f_close(&fil);
-	Music_Load();
+	Music_Play();
 }
 
 void Accelerometer_Read(){

@@ -38,3 +38,7 @@ assignment_2\stm32f7xx_it.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_t
 assignment_2\stm32f7xx_it.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart.h
 assignment_2\stm32f7xx_it.o: ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_uart_ex.h
 assignment_2\stm32f7xx_it.o: ../Core/Inc/stm32f7xx_it.h
+assignment_2\stm32f7xx_it.o: ..\src\Display.h
+assignment_2\stm32f7xx_it.o: ..\src\Device.h
+assignment_2\stm32f7xx_it.o: ..\MPU6050\mpu6050.h
+assignment_2\stm32f7xx_it.o: ../Core/Inc/i2c.h

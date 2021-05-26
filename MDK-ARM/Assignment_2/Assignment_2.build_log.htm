@@ -30,14 +30,18 @@ Warning: *** SUPPORT EXPIRED, NEW PRODUCT SERIAL NUMBER REQUIRED ***
          *** Running with Code Size Limit: 32K                   ***
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Assignment_2'
-compiling Device.c...
-..\src\Device.c(239): warning:  #940-D: missing return statement at end of non-void function "playMusic" 
-  }
-..\src\Device.c: 1 warning, 0 errors
+compiling Display.c...
+..\src\Display.c(93): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  			htim5.Instance -> CCR4 = (1000 - 1) * ((displayParamsPtr -> brightness) + (increment*i))/100.0;
+..\src\Display.c(100): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  			htim5.Instance -> CCR4 = (uint32_t)((1000 - 1) * ((displayParamsPtr -> brightness) - (increment*i))/100.0);
+..\src\Display.c(105): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	htim5.Instance -> CCR4 = (uint32_t)((1000 - 1) * (float)(displayParamsPtr -> brightness)/100.0);
+..\src\Display.c: 3 warnings, 0 errors
 linking...
-Program Size: Code=39708 RO-data=2492 RW-data=608 ZI-data=28208  
+Program Size: Code=46916 RO-data=2484 RW-data=616 ZI-data=28208  
 FromELF: creating hex file...
-"Assignment_2\Assignment_2.axf" - 0 Error(s), 2 Warning(s).
+"Assignment_2\Assignment_2.axf" - 0 Error(s), 4 Warning(s).
 
 <h2>Software Packages used:</h2>
 

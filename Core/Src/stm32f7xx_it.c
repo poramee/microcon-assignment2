@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f7xx_it.h"
+#include "Display.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -64,6 +65,8 @@ extern TIM_HandleTypeDef htim4;
 extern uint32_t count2;
 extern uint32_t count3;
 extern uint32_t count4;
+
+extern DisplayParams displayParams;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -215,6 +218,7 @@ void TIM2_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
 	count2++;
+	if(displayParams.lassPressDuration < 10000) displayParams.lassPressDuration++;
   /* USER CODE END TIM2_IRQn 1 */
 }
 

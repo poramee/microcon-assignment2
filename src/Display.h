@@ -21,6 +21,7 @@ typedef struct{
 	Screen prevScreen;
 	uint8_t forceUpdateScreen;
 	uint8_t brightness;
+	uint32_t lassPressDuration;
 } DisplayParams;
 
 typedef struct{

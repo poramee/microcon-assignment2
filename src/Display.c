@@ -23,6 +23,8 @@ uint8_t prevDrawSec;
 
 int prevIsIdle = 1;
 
+int prevCurrentSong = -2; // -2 = initial state, -1 = inactive
+
 /* COLOR PALETTE  -------------------------------------*/
 struct {
 	uint16_t foreground;
@@ -48,7 +50,6 @@ struct {
 
 /* LOGICS  --------------------------------------------*/
 void updateScreen(){
-	HAL_Delay(50);
 	ILI9341_Fill_Screen(Color.background);
 	displayParamsPtr -> forceUpdateScreen = 1;
 }
@@ -63,6 +64,7 @@ void changePage(Screen screen){
 }
 
 int checkTouchPadTarget(Rect targetArea[], int arraySize){
+	if(displayParamsPtr -> lassPressDuration < 200) return -1;
 	if(TP_Touchpad_Pressed()){	
 		uint16_t position_array[2];
 		if(TP_Read_Coordinates(position_array) == TOUCHPAD_DATA_OK){
@@ -75,6 +77,7 @@ int checkTouchPadTarget(Rect targetArea[], int arraySize){
 				uint16_t x1 = x0 - targetArea[i].height;
 				uint16_t y1 = y0 + targetArea[i].width;
 				if(x0 >= position_array[0] && x1 <= position_array[0] && y0 <= position_array[1] && y1 >= position_array[1]){
+					displayParamsPtr -> lassPressDuration = 0;
 					return i;	
 				}
 			}
@@ -136,7 +139,41 @@ void textWraping(char line1[], char line2[], char original[]){
 void debugRect(Rect rect){
 	ILI9341_Draw_Hollow_Rectangle_Coord(rect.x,rect.y,rect.x + rect.width, rect.y + rect.height, BLUE);
 }
+
+void Draw_Triangle(uint16_t x, uint16_t y, uint16_t sizeX, uint16_t sizeY, uint16_t color, Rect *triangleTarget){
 	
+	for(int i = x;i <= x+sizeX;++i){
+		for(int j = y;j <= y+sizeY;++j){
+			int normalizeX = i - x;
+			int normalizeY = j - y;
+			//char str[50];
+			//sprintf(str,"triangle: %d %d  - %d = %d ",normalizeX,normalizeY, normalizeY,(int)(((float)sizeY/(2*sizeX)) * normalizeX));
+			//UART_Log(str);
+			if(normalizeY >= (int)(((float)sizeY/(2*sizeX)) * normalizeX) && normalizeY <= (int)(((float)-sizeY/(2*sizeX)) * normalizeX) + sizeY) ILI9341_Draw_Pixel(i,j,color);
+		}
+	}
+	Rect target = {x,y,sizeX,sizeY};
+	*triangleTarget = target;
+}
+
+void Draw_TriangleFlip(uint16_t x, uint16_t y, uint16_t sizeX, uint16_t sizeY, uint16_t color, Rect *triangleTarget){
+	
+	for(int i = x;i <= x+sizeX;++i){
+		for(int j = y;j <= y+sizeY;++j){
+			int normalizeX = i - x;
+			int normalizeY = j - y;
+			//char str[50];
+			//sprintf(str,"triangle: %d %d  - %d = %d ",normalizeX,normalizeY, normalizeY,(int)(((float)sizeY/(2*sizeX)) * normalizeX));
+			//UART_Log(str);
+			// && normalizeY <= (int)(((float)sizeY/(2*sizeX)) * normalizeX) + sizeY
+			if(normalizeY >= (int)(((float)-sizeY/(2*sizeX)) * normalizeX + sizeY / 2) && normalizeY <= (int)(((float)sizeY/(2*sizeX)) * normalizeX + sizeY/2)) ILI9341_Draw_Pixel(i,j,color);
+		}
+	}
+	Rect target = {x,y,sizeX,sizeY};
+	*triangleTarget = target;
+}
+
+
 
 void Draw_Custom_Clock_Sec(uint16_t x, uint16_t y,Time time, uint8_t fontSize, uint16_t color, uint16_t bg){
 	char timeDisplay[10];
@@ -196,11 +233,10 @@ void Draw_BottomNavBar(Rect *alarmTarget, Rect *timerTarget, Rect *stopwatchTarg
 }
 
 void Draw_TopBar(char title[],Rect *backBtnTarget){
+	Draw_TriangleFlip(10,11,14,14,BLACK,backBtnTarget);
 	char str[40];
-	sprintf(str,"<< %.21s",title);
-	ILI9341_Draw_Text(str,10,10,Color.foreground, 2, Color.background);
-	Rect returnRect = {0,0,10 + (CHAR_HEIGHT*2),10 + (CHAR_HEIGHT*2)};
-	*backBtnTarget = returnRect;
+	sprintf(str,"%.21s",title);
+	ILI9341_Draw_Text(str,35,10,Color.foreground, 2, Color.background);
 }
 
 void Draw_ToggleSW(uint8_t x,uint8_t y,Status status, uint8_t fontSize,Rect *swTarget){
@@ -229,7 +265,39 @@ void Draw_TopButton(char title[],uint8_t isActive,Rect *btnTarget){
 	*btnTarget = returnRect;
 }
 
+void Draw_PauseButton(uint16_t x, uint16_t y, uint16_t sizeX, uint16_t sizeY,uint16_t thickness, uint16_t color, Rect* target){
+	ILI9341_Draw_Filled_Rectangle_Coord(x,y,x + thickness,y + sizeY,color);
+	ILI9341_Draw_Filled_Rectangle_Coord(x + sizeX - thickness,y,x + sizeX,y + sizeY,color);
+	
+	Rect temp = {x,y,sizeX,sizeY};
+	*target = temp;
+}
 
+void Draw_NextSongButton(uint16_t x, uint16_t y,uint16_t color, Rect *target){
+	Draw_Triangle(x, y, 30, 30, color, target);
+	ILI9341_Draw_Filled_Rectangle_Coord(x + 30,y,x + 33,y + 30,color);
+}
+
+void Draw_PrevSongButton(uint16_t x, uint16_t y,uint16_t color, Rect *target){
+	Draw_TriangleFlip(x + 3, y, 30, 30, color, target);
+	ILI9341_Draw_Filled_Rectangle_Coord(x,y,x + 3,y + 30,color);
+}
+void Draw_CurrentMusicTopBar(){
+	if(deviceParamsPtr -> Music.status == active && prevCurrentSong != deviceParamsPtr -> Music.currentSong){
+		Draw_Triangle(10,10,20,20,Color.active,NULL);
+		char str[40];
+		sprintf(str,"%.21s",deviceParamsPtr -> Music.songName);
+		ILI9341_Draw_Text(str,45,12,Color.foreground, 2, Color.background);
+		prevCurrentSong = deviceParamsPtr -> Music.currentSong;
+	}
+	if((deviceParamsPtr -> Music.status == inactive || deviceParamsPtr -> Music.status == pause) && prevCurrentSong != -1){
+		Draw_Triangle(10,10,20,20,Color.background,NULL);
+		char str[40];
+		sprintf(str,"%.21s",deviceParamsPtr -> Music.songName);
+		ILI9341_Draw_Text(str,45,12,Color.background, 2, Color.background);
+		prevCurrentSong = -1;
+	}
+}
 
 
 
@@ -250,6 +318,8 @@ void Home_Page(){
 		Draw_Button(175,120,"CLOCK", 3, WHITE, Color.accent, &targetRect[1]);
 		Draw_Button(180,200,"SETTINGS", 2, WHITE, 0x0000, &targetRect[2]);
 	}
+	
+	Draw_CurrentMusicTopBar(); // Dynamically Update
 	
 	if(isClockUpdated(2) || displayParamsPtr -> forceUpdateScreen){
 		Draw_Clock(70,30, 6, Color.foreground, Color.background);
@@ -623,15 +693,16 @@ void Music_Page(){
 		char songNameLine[2][50];
 		
 		textWraping(songNameLine[0], songNameLine[1], deviceParamsPtr -> Music.songName);
-		
-		
 		ILI9341_Draw_Text(songNameLine[0], 50, 70, Color.foreground, 3 , Color.background);
+		//int playButtonX = 106 - (deviceParamsPtr -> Music.status == active? 9: 0);
+		//Draw_Button(playButtonX,150,(deviceParamsPtr -> Music.status == active? "PAUSE": "PLAY"), 3, WHITE, Color.accent, &targetRect[1]);
+		//Draw_Button(38,158,"<<", 2, WHITE, BLACK, &targetRect[2]);
+		//Draw_Button(234,158,">>", 2, WHITE, BLACK, &targetRect[3]);
 		
-		
-		int playButtonX = 106 - (deviceParamsPtr -> Music.status == active? 9: 0);
-		Draw_Button(playButtonX,150,(deviceParamsPtr -> Music.status == active? "PAUSE": "PLAY"), 3, WHITE, Color.accent, &targetRect[1]);
-		Draw_Button(38,158,"<<", 2, WHITE, BLACK, &targetRect[2]);
-		Draw_Button(234,158,">>", 2, WHITE, BLACK, &targetRect[3]);
+		if(deviceParamsPtr -> Music.status == active) Draw_PauseButton(135,170,50,50,20,Color.accent,&targetRect[1]);
+		else Draw_Triangle(135,170,50,50,Color.accent,&targetRect[1]);
+		Draw_PrevSongButton(57,180,Color.foreground,&targetRect[2]);
+		Draw_NextSongButton(230,180,Color.foreground, &targetRect[3]);
 	}
 	
 	updateScreenComplete();

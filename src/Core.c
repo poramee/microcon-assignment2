@@ -6,6 +6,7 @@ DisplayParams DisplayParams_Default = {
 .prevScreen=Idle,
 .forceUpdateScreen=1,
 .brightness=50,
+.lassPressDuration = 0,
 };
 
 DeviceParams DeviceParams_Default = {
