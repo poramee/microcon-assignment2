@@ -225,14 +225,15 @@ int playMusic() {
 	}
 	else if(!end_of_file_reached) {
 		end_of_file_reached = true;
-		if(deviceParamsPtr -> Music.currentSong < deviceParamsPtr -> Music.totalSongs - 1) Music_Next();
-		else Music_Stop();
 		fres = f_close(&fil);
 		if(fres == FR_OK) {
 			UART_Log("end music and close file complete.");
+			if(deviceParamsPtr -> Music.currentSong < deviceParamsPtr -> Music.totalSongs - 1) Music_Next();
+			else Music_Stop();
 		}
 		else if(fres != FR_OK) {
 			sprintf(tmp_txt, "f_close() failed, res = %d\r\n", fres);
+			Music_Stop();
 			UART_Log(tmp_txt);
 			return -14;
 		}
@@ -352,10 +353,10 @@ void Music_UnMute(){
 
 // Public Functions
 void Music_FunctionLoop(){
-	if(deviceParamsPtr -> Music.status == active) playMusic();
+	if(deviceParamsPtr -> Music.status == active || deviceParamsPtr -> isAlarmSoundPlaying) playMusic();
 }
 
-void Music_Load(){
+void Music_LoadSongNames(){
 	UART_Log("Start");
 	// FIL file;
 	FRESULT open = f_open(&fil,"detail.txt", FA_READ);
@@ -383,7 +384,33 @@ void Music_Load(){
 		}
 		++lineCnt;
 	}
+}
+void AlarmSound_Play(){
+	if(deviceParamsPtr -> isAlarmSoundPlaying) return;
+	deviceParamsPtr -> isAlarmSoundPlaying = 1;
 	
+	Music_Stop();
+	Music_UnMute();
+	char songNameToLoad[20];
+	sprintf(songNameToLoad, "alarm.wav");
+	initWavFile(songNameToLoad);
+	
+}
+
+void AlarmSound_Stop(){
+	Music_Mute();
+	deviceParamsPtr -> isAlarmSoundPlaying = 0;
+	f_close(&fil);
+	signal_play_buff = NULL;
+	signal_read_buff = NULL;
+	for(int i = 0;i < 4096;++i){
+		signal_buff1[i] = signal_buff2[i] = 0;
+	}
+	
+}
+
+void Music_Load(){
+	Music_LoadSongNames();
 	char songNameToLoad[100];
 	sprintf(songNameToLoad, "%d.wav", deviceParamsPtr -> Music.currentSong);
 	initWavFile(songNameToLoad);
@@ -403,7 +430,6 @@ void Music_Pause(){
 }
 
 void Music_Stop(){
-	
 	Music_Mute();
 	
 	f_close(&fil);

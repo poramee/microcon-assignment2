@@ -25,6 +25,8 @@ int prevIsIdle = 1;
 
 int prevCurrentSong = -2; // -2 = initial state, -1 = inactive
 
+int isMusicPageVisited = 0;
+
 /* COLOR PALETTE  -------------------------------------*/
 struct {
 	uint16_t foreground;
@@ -87,6 +89,11 @@ int checkTouchPadTarget(Rect targetArea[], int arraySize){
 }
 
 void setBrightness(uint8_t newBrightness){
+	int isMusicPlaying = 0;
+	if(deviceParamsPtr -> Music.status == active){
+		isMusicPlaying = 1;
+		Music_Pause();
+	}
 	if(newBrightness > displayParamsPtr -> brightness){
 		float increment = (newBrightness - (displayParamsPtr -> brightness))/20.0;
 		for(int i = 0;i < 20;++i){
@@ -103,6 +110,7 @@ void setBrightness(uint8_t newBrightness){
 	}
 	displayParamsPtr -> brightness = newBrightness;
 	htim5.Instance -> CCR4 = (uint32_t)((1000 - 1) * (float)(displayParamsPtr -> brightness)/100.0);
+	if(isMusicPlaying == 1) Music_Play();
 }
 
 uint8_t isClockUpdated(uint8_t resolution){ // 1 = hour, 2 = hour + min, 3 = hour + min + sec
@@ -289,8 +297,12 @@ void Draw_PrevSongButton(uint16_t x, uint16_t y,uint16_t color, Rect *target){
 	ILI9341_Draw_Filled_Rectangle_Coord(x,y,x + 3,y + 30,color);
 }
 void Draw_CurrentMusicTopBar(){
+	char clearLine[21];
+	sprintf(clearLine,"                     ");
+	
 	if(deviceParamsPtr -> Music.status == active && (prevCurrentSong != deviceParamsPtr -> Music.currentSong || displayParamsPtr -> forceUpdateScreen)){
 		Draw_Triangle(10,10,20,20,Color.active,NULL);
+		ILI9341_Draw_Text(clearLine,45,12,Color.foreground, 2, Color.background);
 		char str[40];
 		sprintf(str,"%.21s",deviceParamsPtr -> Music.songName);
 		ILI9341_Draw_Text(str,45,12,Color.foreground, 2, Color.background);
@@ -298,6 +310,7 @@ void Draw_CurrentMusicTopBar(){
 	}
 	if((deviceParamsPtr -> Music.status == inactive || deviceParamsPtr -> Music.status == pause) && (prevCurrentSong != -1 || displayParamsPtr -> forceUpdateScreen)){
 		Draw_Triangle(10,10,20,20,Color.background,NULL);
+		ILI9341_Draw_Text(clearLine,45,12,Color.foreground, 2, Color.background);
 		char str[40];
 		sprintf(str,"%.21s",deviceParamsPtr -> Music.songName);
 		ILI9341_Draw_Text(str,45,12,Color.background, 2, Color.background);
@@ -693,6 +706,10 @@ void Settings_Page(){
 }
 
 void Music_Page(){
+	if(isMusicPageVisited == 0){
+		Music_LoadSongNames();
+		isMusicPageVisited = 1;
+	}
 	if(displayParamsPtr -> forceUpdateScreen){
 		
 		Draw_TopBar("MUSIC", &targetRect[0]);
@@ -753,6 +770,7 @@ void Music_Page(){
 
 void AlarmPopup_Page(){
 	if(isClockUpdated(2) || displayParamsPtr -> forceUpdateScreen){
+		setBrightness(deviceParamsPtr -> userBrightness);
 		ILI9341_Fill_Screen(Color.alert);
 		Draw_Clock(70,30, 6, WHITE, Color.alert);
 		ILI9341_Draw_Text("ALARM",100,100,Color.background,4,Color.alert);
@@ -764,6 +782,7 @@ void AlarmPopup_Page(){
 	switch(checkTouchPadTarget(targetRect, 1)){
 		case 0:
 			deviceParamsPtr -> Alarm_status = inactive;
+			AlarmSound_Stop();
 			changePage(displayParamsPtr -> prevScreen);
 			break;
 	}
@@ -771,6 +790,7 @@ void AlarmPopup_Page(){
 
 void TimerPopup_Page(){
 	if(displayParamsPtr -> forceUpdateScreen){
+		setBrightness(deviceParamsPtr -> userBrightness);
 		ILI9341_Fill_Screen(Color.alert);
 		ILI9341_Draw_Text("TIMER",100,100,Color.background,4,Color.alert);
 		Draw_Button(106,180,"STOP",3,WHITE,Color.accent,&targetRect[0]);
@@ -780,6 +800,7 @@ void TimerPopup_Page(){
 	
 	switch(checkTouchPadTarget(targetRect, 1)){
 		case 0:
+			AlarmSound_Stop();
 			deviceParamsPtr -> Timer_status = inactive;
 			changePage(displayParamsPtr -> prevScreen);
 			break;
@@ -800,9 +821,11 @@ void Display_Init(){
 
 void displayScreen(){
 	if(deviceParamsPtr -> Alarm_status == done && displayParamsPtr -> currentScreen != AlarmPopup && displayParamsPtr -> currentScreen != TimerPopup){
+		AlarmSound_Play();
 		changePage(AlarmPopup);
 	}
 	if(deviceParamsPtr -> Timer_status == done && displayParamsPtr -> currentScreen != TimerPopup && displayParamsPtr -> currentScreen != AlarmPopup){
+		AlarmSound_Play();
 		changePage(TimerPopup);
 	}
 	
@@ -836,6 +859,7 @@ void displayScreen(){
 			Music_Page();
 			break;
 		case Settings:
+			Music_Pause();
 			Settings_Page();
 			break;
 		case AlarmPopup:

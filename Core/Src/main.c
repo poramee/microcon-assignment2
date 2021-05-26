@@ -144,7 +144,7 @@ int main(void)
 		
 		Music_FunctionLoop();
 		
-		checkAutoSleepWake();
+		if(displayParams.currentScreen != AlarmPopup && displayParams.currentScreen != TimerPopup) checkAutoSleepWake();
   }
   /* USER CODE END 3 */
 }

@@ -33,6 +33,7 @@ typedef struct{
 	
 	Status Alarm_status;
 	Time Alarm_time;
+	int isAlarmSoundPlaying;
 	
 	Status Timer_status;
 	Time Timer_time;
@@ -62,7 +63,11 @@ void Stopwatch_Pause(void );
 void Stopwatch_Reset(void );
 void updateStopwatch(void );
 
+void AlarmSound_Play(void );
+void AlarmSound_Stop(void );
+
 void Music_FunctionLoop(void );
+void Music_LoadSongNames(void );
 void Music_Load(void );
 void Music_Play(void );
 void Music_Pause(void );
