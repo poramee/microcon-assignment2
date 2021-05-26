@@ -16,7 +16,7 @@ DeviceParams DeviceParams_Default = {
 .Alarm_time={0,0,0},
 .Timer_status=inactive,
 .Timer_time={0,0,0},
-.Music={inactive, 0,0},
+.Music={inactive,"","", 0,0},
 .userBrightness=50
 };
 #endif

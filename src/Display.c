@@ -68,9 +68,9 @@ int checkTouchPadTarget(Rect targetArea[], int arraySize){
 	if(TP_Touchpad_Pressed()){	
 		uint16_t position_array[2];
 		if(TP_Read_Coordinates(position_array) == TOUCHPAD_DATA_OK){
-			char str[10];
-			sprintf(str,"%d %d",position_array[0], position_array[1]);
-			UART_Log(str);
+			//char str[10];
+			//sprintf(str,"%d %d",position_array[0], position_array[1]);
+			//UART_Log(str);
 			for(int i = 0;i < arraySize;++i){
 				uint16_t x0 = 240 - targetArea[i].y;
 				uint16_t y0 = targetArea[i].x;
@@ -121,18 +121,24 @@ int isSleeping(){
 	return isSleeping;
 }
 
-void textWraping(char line1[], char line2[], char original[]){
+void textWrapingSongName(char line1[], char original[]){
 	int length = strlen(original);
-	char str[10];
-	sprintf(str,"%d", length);
-	UART_Log(str);
-	if(length <= 11){
+	if(length <= 13){
 		sprintf(line1,"%s",original);
 	}
 	else{
-		sprintf(line1,"%.11s...",original);
+		sprintf(line1,"%.13s",original);
 	}
-	sprintf(line2,"");
+}
+
+void textWrapingSongArtist(char line1[], char original[]){
+	int length = strlen(original);
+	if(length <= 13){
+		sprintf(line1,"%s",original);
+	}
+	else{
+		sprintf(line1,"%.18s",original);
+	}
 }
 
 /* COMPONENTS  --------------------------------------------*/
@@ -283,14 +289,14 @@ void Draw_PrevSongButton(uint16_t x, uint16_t y,uint16_t color, Rect *target){
 	ILI9341_Draw_Filled_Rectangle_Coord(x,y,x + 3,y + 30,color);
 }
 void Draw_CurrentMusicTopBar(){
-	if(deviceParamsPtr -> Music.status == active && prevCurrentSong != deviceParamsPtr -> Music.currentSong){
+	if(deviceParamsPtr -> Music.status == active && (prevCurrentSong != deviceParamsPtr -> Music.currentSong || displayParamsPtr -> forceUpdateScreen)){
 		Draw_Triangle(10,10,20,20,Color.active,NULL);
 		char str[40];
 		sprintf(str,"%.21s",deviceParamsPtr -> Music.songName);
 		ILI9341_Draw_Text(str,45,12,Color.foreground, 2, Color.background);
 		prevCurrentSong = deviceParamsPtr -> Music.currentSong;
 	}
-	if((deviceParamsPtr -> Music.status == inactive || deviceParamsPtr -> Music.status == pause) && prevCurrentSong != -1){
+	if((deviceParamsPtr -> Music.status == inactive || deviceParamsPtr -> Music.status == pause) && (prevCurrentSong != -1 || displayParamsPtr -> forceUpdateScreen)){
 		Draw_Triangle(10,10,20,20,Color.background,NULL);
 		char str[40];
 		sprintf(str,"%.21s",deviceParamsPtr -> Music.songName);
@@ -308,6 +314,7 @@ void Idle_Page(){
 	if(isClockUpdated(2) || displayParamsPtr -> forceUpdateScreen){
 		Draw_Clock(75,90, 6, Color.foreground, Color.background);
 	}
+	Draw_CurrentMusicTopBar(); // Dynamically Update
 	updateScreenComplete();
 }
 
@@ -692,8 +699,12 @@ void Music_Page(){
 		
 		char songNameLine[2][50];
 		
-		textWraping(songNameLine[0], songNameLine[1], deviceParamsPtr -> Music.songName);
-		ILI9341_Draw_Text(songNameLine[0], 50, 70, Color.foreground, 3 , Color.background);
+		textWrapingSongName(songNameLine[0], deviceParamsPtr -> Music.songName);
+		textWrapingSongArtist(songNameLine[1], deviceParamsPtr -> Music.songArtist);
+		
+		ILI9341_Draw_Text(songNameLine[0], 35, 70, Color.foreground, 3 , Color.background);
+		ILI9341_Draw_Text(songNameLine[1], 35, 100, Color.foreground, 2 , Color.background);
+		
 		//int playButtonX = 106 - (deviceParamsPtr -> Music.status == active? 9: 0);
 		//Draw_Button(playButtonX,150,(deviceParamsPtr -> Music.status == active? "PAUSE": "PLAY"), 3, WHITE, Color.accent, &targetRect[1]);
 		//Draw_Button(38,158,"<<", 2, WHITE, BLACK, &targetRect[2]);
@@ -703,9 +714,13 @@ void Music_Page(){
 		else Draw_Triangle(135,170,50,50,Color.accent,&targetRect[1]);
 		Draw_PrevSongButton(57,180,Color.foreground,&targetRect[2]);
 		Draw_NextSongButton(230,180,Color.foreground, &targetRect[3]);
+		
+		if(deviceParamsPtr -> Music.status == active) prevCurrentSong = deviceParamsPtr -> Music.currentSong;
+		else prevCurrentSong = -1;
 	}
 	
 	updateScreenComplete();
+	
 	switch(checkTouchPadTarget(targetRect, 4)){
 		case 0:
 			changePage(Home);
@@ -723,6 +738,10 @@ void Music_Page(){
 			updateScreen();
 			break;
 		default:
+			if(deviceParamsPtr -> Music.status == inactive && prevCurrentSong != -1){
+				prevCurrentSong = -1;
+				updateScreen();
+			}
 			break;
 	}
 }

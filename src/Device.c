@@ -225,11 +225,11 @@ int playMusic() {
 	}
 	else if(!end_of_file_reached) {
 		end_of_file_reached = true;
-		
+		if(deviceParamsPtr -> Music.currentSong < deviceParamsPtr -> Music.totalSongs - 1) Music_Next();
+		else Music_Stop();
 		fres = f_close(&fil);
 		if(fres == FR_OK) {
 			UART_Log("end music and close file complete.");
-			Music_Next(); // Play Next Song
 		}
 		else if(fres != FR_OK) {
 			sprintf(tmp_txt, "f_close() failed, res = %d\r\n", fres);
@@ -356,8 +356,37 @@ void Music_FunctionLoop(){
 }
 
 void Music_Load(){
-	sprintf(deviceParamsPtr -> Music.songName,"%d.wav",deviceParamsPtr -> Music.currentSong);
-	initWavFile(deviceParamsPtr -> Music.songName);
+	UART_Log("Start");
+	// FIL file;
+	FRESULT open = f_open(&fil,"detail.txt", FA_READ);
+	if(open == FR_OK) UART_Log("Read OK");
+	
+	char buffer[100];
+	int songToLoad = deviceParamsPtr -> Music.currentSong;
+	int lineCnt = 0;
+	while(f_gets(buffer,sizeof(buffer),&fil)){
+		if(lineCnt == 0){
+			sscanf(buffer,"%d", &deviceParamsPtr -> Music.totalSongs);
+		}
+		else if(lineCnt - 1 == songToLoad){
+			char *token = buffer;
+			token = strtok(token,"$");
+			sprintf(deviceParamsPtr -> Music.songName,"%s", token);
+			
+			token = strtok(NULL,"\n");
+			sprintf(deviceParamsPtr -> Music.songArtist,"%s", token);
+			
+			UART_Log(deviceParamsPtr -> Music.songName);
+			UART_Log(deviceParamsPtr -> Music.songArtist);
+			
+			break;
+		}
+		++lineCnt;
+	}
+	
+	char songNameToLoad[100];
+	sprintf(songNameToLoad, "%d.wav", deviceParamsPtr -> Music.currentSong);
+	initWavFile(songNameToLoad);
 }
 
 void Music_Play(){
@@ -389,7 +418,7 @@ void Music_Stop(){
 
 void Music_Next(){
 	Music_Stop();
-	deviceParamsPtr -> Music.currentSong++;
+	if(deviceParamsPtr -> Music.currentSong < deviceParamsPtr -> Music.totalSongs - 1) deviceParamsPtr -> Music.currentSong++;
 	Music_Play();
 }
 
@@ -416,7 +445,7 @@ void checkAutoSleepWake(){
 		//UART_Log("Sleep");
 		deviceParamsPtr -> isIdle = 1;
 	}
-	deviceParamsPtr -> isIdle = 0; // Test Only
+	// deviceParamsPtr -> isIdle = 0; // Test Only
 }
 
 
