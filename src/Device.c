@@ -244,6 +244,7 @@ int playMusic() {
 
 /* INIT FUNCTION  ------------------------------------------*/
 void Device_Init(){
+	UART_Log("INIT");
 	while (MPU6050_Init(&hi2c1) == 1);
 	initSDCARD();
 }
@@ -265,7 +266,7 @@ void checkMainClock(){
 			deviceParamsPtr -> currentTime.min = 0;
 			++deviceParamsPtr -> currentTime.hour;
 		}
-		else if(deviceParamsPtr -> currentTime.hour >= 24) deviceParamsPtr -> currentTime.hour = 0;
+		if(deviceParamsPtr -> currentTime.hour >= 24) deviceParamsPtr -> currentTime.hour = 0;
 	}
 }
 
@@ -357,7 +358,8 @@ void Music_FunctionLoop(){
 }
 
 void Music_LoadSongNames(){
-	UART_Log("Start");
+	UART_Log("Loading Song Name List");
+       
 	// FIL file;
 	FRESULT open = f_open(&fil,"detail.txt", FA_READ);
 	if(open == FR_OK) UART_Log("Read OK");
