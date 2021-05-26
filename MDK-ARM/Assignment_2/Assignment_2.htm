@@ -3,9 +3,9 @@
 <title>Static Call Graph - [Assignment_2\Assignment_2.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image Assignment_2\Assignment_2.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Thu May 27 01:15:38 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Thu May 27 02:07:51 2021
 <BR><P>
-<H3>Maximum Stack Usage =        672 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        688 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 main &rArr; displayScreen &rArr; Music_Page &rArr; Music_Prev &rArr; Music_Play &rArr; Music_Load &rArr; Music_LoadSongNames &rArr; f_open &rArr; dir_register &rArr; dir_find &rArr; dir_next &rArr; create_chain &rArr; put_fat &rArr; move_window &rArr; sync_window &rArr; disk_write
 <P>
@@ -753,6 +753,7 @@ Global Symbols
 <LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2sprintf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[1a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;displayScreen
+<LI><a href="#[149]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playMusic
 </UL>
 
 <P><STRONG><a name="[a7]"></a>AlarmSound_Stop</STRONG> (Thumb, 58 bytes, Stack size 8 bytes, device.o(i.AlarmSound_Stop))
@@ -1969,8 +1970,8 @@ Global Symbols
 <LI><a href="#[149]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playMusic
 </UL>
 
-<P><STRONG><a name="[151]"></a>Music_Page</STRONG> (Thumb, 370 bytes, Stack size 120 bytes, display.o(i.Music_Page))
-<BR><BR>[Stack]<UL><LI>Max Depth = 664<LI>Call Chain = Music_Page &rArr; Music_Prev &rArr; Music_Play &rArr; Music_Load &rArr; Music_LoadSongNames &rArr; f_open &rArr; dir_register &rArr; dir_find &rArr; dir_next &rArr; create_chain &rArr; put_fat &rArr; move_window &rArr; sync_window &rArr; disk_write
+<P><STRONG><a name="[151]"></a>Music_Page</STRONG> (Thumb, 424 bytes, Stack size 136 bytes, display.o(i.Music_Page))
+<BR><BR>[Stack]<UL><LI>Max Depth = 680<LI>Call Chain = Music_Page &rArr; Music_Prev &rArr; Music_Play &rArr; Music_Load &rArr; Music_LoadSongNames &rArr; f_open &rArr; dir_register &rArr; dir_find &rArr; dir_next &rArr; create_chain &rArr; put_fat &rArr; move_window &rArr; sync_window &rArr; disk_write
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ILI9341_Draw_Text
 <LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;updateScreenComplete
@@ -1989,6 +1990,7 @@ Global Symbols
 <LI><a href="#[154]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Music_Pause
 <LI><a href="#[14f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Music_Next
 <LI><a href="#[14b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Music_LoadSongNames
+<LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2sprintf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[1a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;displayScreen
 </UL>
@@ -2415,6 +2417,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[152]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;textWrapingSongName
 <LI><a href="#[153]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;textWrapingSongArtist
 <LI><a href="#[168]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Settings_Page
+<LI><a href="#[151]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Music_Page
 <LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Draw_TopBar
 <LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Draw_ToggleSW
 <LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Draw_Custom_Clock_Sec
@@ -2592,7 +2595,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[1a4]"></a>displayScreen</STRONG> (Thumb, 216 bytes, Stack size 8 bytes, display.o(i.displayScreen))
-<BR><BR>[Stack]<UL><LI>Max Depth = 672<LI>Call Chain = displayScreen &rArr; Music_Page &rArr; Music_Prev &rArr; Music_Play &rArr; Music_Load &rArr; Music_LoadSongNames &rArr; f_open &rArr; dir_register &rArr; dir_find &rArr; dir_next &rArr; create_chain &rArr; put_fat &rArr; move_window &rArr; sync_window &rArr; disk_write
+<BR><BR>[Stack]<UL><LI>Max Depth = 688<LI>Call Chain = displayScreen &rArr; Music_Page &rArr; Music_Prev &rArr; Music_Play &rArr; Music_Load &rArr; Music_LoadSongNames &rArr; f_open &rArr; dir_register &rArr; dir_find &rArr; dir_next &rArr; create_chain &rArr; put_fat &rArr; move_window &rArr; sync_window &rArr; disk_write
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;setBrightness
 <LI><a href="#[1a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;isWaking
@@ -2770,7 +2773,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[7b]"></a>main</STRONG> (Thumb, 150 bytes, Stack size 0 bytes, main.o(i.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 672<LI>Call Chain = main &rArr; displayScreen &rArr; Music_Page &rArr; Music_Prev &rArr; Music_Play &rArr; Music_Load &rArr; Music_LoadSongNames &rArr; f_open &rArr; dir_register &rArr; dir_find &rArr; dir_next &rArr; create_chain &rArr; put_fat &rArr; move_window &rArr; sync_window &rArr; disk_write
+<BR><BR>[Stack]<UL><LI>Max Depth = 688<LI>Call Chain = main &rArr; displayScreen &rArr; Music_Page &rArr; Music_Prev &rArr; Music_Play &rArr; Music_Load &rArr; Music_LoadSongNames &rArr; f_open &rArr; dir_register &rArr; dir_find &rArr; dir_next &rArr; create_chain &rArr; put_fat &rArr; move_window &rArr; sync_window &rArr; disk_write
 </UL>
 <BR>[Calls]<UL><LI><a href="#[1c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;updateTimer
 <LI><a href="#[1c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;updateStopwatch
@@ -2808,7 +2811,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[128]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ILI9341_Draw_Colour_Burst
 </UL>
 
-<P><STRONG><a name="[149]"></a>playMusic</STRONG> (Thumb, 206 bytes, Stack size 8 bytes, device.o(i.playMusic))
+<P><STRONG><a name="[149]"></a>playMusic</STRONG> (Thumb, 228 bytes, Stack size 8 bytes, device.o(i.playMusic))
 <BR><BR>[Stack]<UL><LI>Max Depth = 552<LI>Call Chain = playMusic &rArr; Music_Next &rArr; Music_Play &rArr; Music_Load &rArr; Music_LoadSongNames &rArr; f_open &rArr; dir_register &rArr; dir_find &rArr; dir_next &rArr; create_chain &rArr; put_fat &rArr; move_window &rArr; sync_window &rArr; disk_write
 </UL>
 <BR>[Calls]<UL><LI><a href="#[1aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;f_read
@@ -2816,6 +2819,7 @@ Global Symbols
 <LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Log
 <LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Music_Stop
 <LI><a href="#[14f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Music_Next
+<LI><a href="#[a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AlarmSound_Play
 <LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__2sprintf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[148]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Music_FunctionLoop

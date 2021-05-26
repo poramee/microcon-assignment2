@@ -719,8 +719,13 @@ void Music_Page(){
 		textWrapingSongName(songNameLine[0], deviceParamsPtr -> Music.songName);
 		textWrapingSongArtist(songNameLine[1], deviceParamsPtr -> Music.songArtist);
 		
-		ILI9341_Draw_Text(songNameLine[0], 35, 70, Color.foreground, 3 , Color.background);
-		ILI9341_Draw_Text(songNameLine[1], 35, 100, Color.foreground, 2 , Color.background);
+		char currentSongNumber[20];
+		
+		sprintf(currentSongNumber, "%d of %d", deviceParamsPtr -> Music.currentSong + 1, deviceParamsPtr -> Music.totalSongs);
+		
+		ILI9341_Draw_Text(currentSongNumber,35, 60, Color.foreground, 1, Color.background);
+		ILI9341_Draw_Text(songNameLine[0], 35, 80, Color.foreground, 3 , Color.background);
+		ILI9341_Draw_Text(songNameLine[1], 35, 110, Color.foreground, 2 , Color.background);
 		
 		//int playButtonX = 106 - (deviceParamsPtr -> Music.status == active? 9: 0);
 		//Draw_Button(playButtonX,150,(deviceParamsPtr -> Music.status == active? "PAUSE": "PLAY"), 3, WHITE, Color.accent, &targetRect[1]);

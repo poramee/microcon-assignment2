@@ -228,7 +228,11 @@ int playMusic() {
 		fres = f_close(&fil);
 		if(fres == FR_OK) {
 			UART_Log("end music and close file complete.");
-			if(deviceParamsPtr -> Music.currentSong < deviceParamsPtr -> Music.totalSongs - 1) Music_Next();
+			if(deviceParamsPtr -> isAlarmSoundPlaying){
+				deviceParamsPtr -> isAlarmSoundPlaying = 0;
+				AlarmSound_Play();
+			}
+			else if(deviceParamsPtr -> Music.currentSong < deviceParamsPtr -> Music.totalSongs - 1) Music_Next();
 			else Music_Stop();
 		}
 		else if(fres != FR_OK) {
