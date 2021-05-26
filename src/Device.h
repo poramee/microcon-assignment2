@@ -61,7 +61,7 @@ void Stopwatch_Pause(void );
 void Stopwatch_Reset(void );
 void updateStopwatch(void );
 
-
+void Music_FunctionLoop(void );
 void Music_Load(void );
 void Music_Play(void );
 void Music_Pause(void );

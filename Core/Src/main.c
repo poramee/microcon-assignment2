@@ -31,8 +31,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Core.h"
-#include "fatfs_sd.h"
-#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -72,7 +70,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+extern void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s);
 /* USER CODE END 0 */
 
 /**
@@ -143,6 +141,8 @@ int main(void)
 		checkAlarmClock();
 		updateTimer();
 		updateStopwatch();
+		
+		Music_FunctionLoop();
 		
 		checkAutoSleepWake();
   }

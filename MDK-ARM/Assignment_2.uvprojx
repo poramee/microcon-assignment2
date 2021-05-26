@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F767xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F7xx_HAL_Driver/Inc;../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F7xx/Include;../Drivers/CMSIS/Include;..\ILI9341;..\src;..\MPU6050;../FATFS/Target;../FATFS/App;../Middlewares/Third_Party/FatFs/src;..\SD Card</IncludePath>
+              <IncludePath>../Core/Inc;  ../Drivers/STM32F7xx_HAL_Driver/Inc;  ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy;  ../Drivers/CMSIS/Device/ST/STM32F7xx/Include;  ../Drivers/CMSIS/Include;  ..\ILI9341;  ..\src;  ..\MPU6050;  ../FATFS/Target;  ../FATFS/App;  ../Middlewares/Third_Party/FatFs/src;  ..\SD Card</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

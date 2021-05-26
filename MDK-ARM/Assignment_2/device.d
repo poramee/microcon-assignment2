@@ -42,3 +42,14 @@ assignment_2\device.o: ..\MPU6050\mpu6050.h
 assignment_2\device.o: ../Core/Inc/i2c.h
 assignment_2\device.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 assignment_2\device.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+assignment_2\device.o: ..\SD Card\fatfs_sd.h
+assignment_2\device.o: ../Core/Inc/spi.h
+assignment_2\device.o: ../Middlewares/Third_Party/FatFs/src/diskio.h
+assignment_2\device.o: ../Middlewares/Third_Party/FatFs/src/integer.h
+assignment_2\device.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
+assignment_2\device.o: ../FATFS/App/fatfs.h
+assignment_2\device.o: ../Middlewares/Third_Party/FatFs/src/ff.h
+assignment_2\device.o: ../FATFS/Target/ffconf.h
+assignment_2\device.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+assignment_2\device.o: ../Middlewares/Third_Party/FatFs/src/ff_gen_drv.h
+assignment_2\device.o: ../FATFS/Target/user_diskio.h

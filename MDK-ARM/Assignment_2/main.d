@@ -56,5 +56,3 @@ assignment_2\main.o: ..\src\Core.h
 assignment_2\main.o: ..\src\Device.h
 assignment_2\main.o: ..\MPU6050\mpu6050.h
 assignment_2\main.o: ..\src\Display.h
-assignment_2\main.o: ..\SD Card\fatfs_sd.h
-assignment_2\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

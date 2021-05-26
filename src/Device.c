@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "fatfs_sd.h"
+#include "stdbool.h"
+#include "fatfs.h"
+
 /* VARIABLES  ---------------------------------------------*/
 extern DeviceParams* deviceParamsPtr;
 extern UART_HandleTypeDef huart3;
@@ -13,11 +17,235 @@ extern uint32_t count4;
 
 Time Clear_Time = {0,0,0};
 
+
+/* MUSIC FUNCTIONS  -----------------------------------------*/
+
+
+FATFS fs;
+FIL fil;
+FRESULT fres;
+
+volatile bool end_of_file_reached = false;
+volatile bool read_next_chunk = false;
+volatile uint16_t* signal_play_buff = NULL;
+volatile uint16_t* signal_read_buff = NULL;
+volatile uint16_t signal_buff1[4096];
+volatile uint16_t signal_buff2[4096];
+
+uint32_t fileSize;
+uint32_t headerSizeLeft;
+uint16_t compression;
+uint16_t channelsNum;
+uint32_t sampleRate;
+uint32_t bytesPerSecond;
+uint16_t bytesPerSample;
+uint16_t bitsPerSamplePerChannel;
+uint32_t dataSize;
+unsigned int bytesRead;
+HAL_StatusTypeDef hal_res;
+
+extern I2S_HandleTypeDef hi2s2;
+
+char tmp_txt[100];
+
+
+// HAL_I2S
+void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s) {
+	if(end_of_file_reached)
+		return;
+
+	volatile uint16_t* temp = signal_play_buff;
+	signal_play_buff = signal_read_buff;
+	signal_read_buff = temp;
+
+	int nsamples = sizeof(signal_buff1) / sizeof(signal_buff1[0]);
+	HAL_I2S_Transmit_IT(&hi2s2, (uint16_t*)signal_play_buff, nsamples);
+	read_next_chunk = true;
+}
+
+// init sd card
+void initSDCARD() {
+	fres = f_mount(&fs, "", 0);
+	if (fres == FR_OK) {
+		UART_Log("Micro SD card is mounted successfully!");
+	} else if (fres != FR_OK) {
+		UART_Log("Micro SD card's mount error!");
+	}
+}
+
+// play wav file
+int initWavFile(const char* fname) {
+	sprintf(tmp_txt, "Openning %s...", fname);
+	UART_Log(tmp_txt);
+	fres = f_open(&fil, fname, FA_READ);
+	if (fres == FR_OK) {
+		UART_Log("f_open() Complete.");
+	}
+	else {
+		UART_Log("f_open() Fail.");
+		return -1;
+	}
+	
+	UART_Log("File opened, reading...");
+	
+	uint8_t header[44];
+	fres = f_read(&fil, header, sizeof(header), &bytesRead);
+	if (fres != FR_OK) {
+		UART_Log("f_read() failed.");
+		f_close(&fil);
+		return -2;
+	}
+	
+	if (memcmp((const char*)header, "RIFF", 4) != 0) {
+		sprintf(tmp_txt, "Wrong WAV signature at offset 0: 0x%02X 0x%02X 0x%02X 0x%02X", header[0], header[1], header[2], header[3]);
+		UART_Log(tmp_txt);
+		f_close(&fil);
+		return -3;
+	}
+	
+	if (memcmp((const char*)header + 8, "WAVEfmt ", 8) != 0) {
+		UART_Log("Wrong WAV signature at offset 8!");
+		f_close(&fil);
+		return -4;
+	}
+	
+	if (memcmp((const char*)header + 36, "data", 4) != 0) {
+		UART_Log("Wrong WAV signature at offset 36!");
+		f_close(&fil);
+		return -5;
+	}
+	
+	fileSize = 8 + (header[4] | (header[5] << 8) | (header[6] << 16) | (header[7] << 24));
+	headerSizeLeft = header[16] | (header[17] << 8) | (header[18] << 16) | (header[19] << 24);
+  compression = header[20] | (header[21] << 8);
+  channelsNum = header[22] | (header[23] << 8);
+  sampleRate = header[24] | (header[25] << 8) | (header[26] << 16) | (header[27] << 24);
+  bytesPerSecond = header[28] | (header[29] << 8) | (header[30] << 16) | (header[31] << 24);
+  bytesPerSample = header[32] | (header[33] << 8);
+  bitsPerSamplePerChannel = header[34] | (header[35] << 8);
+  dataSize = header[40] | (header[41] << 8) | (header[42] << 16) | (header[43] << 24);
+	
+	UART_Log("--- WAV header ---");
+	sprintf(tmp_txt, "File size: %u", fileSize);
+	UART_Log(tmp_txt);
+	sprintf(tmp_txt, "Header size left: %u", headerSizeLeft);
+	UART_Log(tmp_txt);
+	sprintf(tmp_txt, "Compression (1 = no compression): %d", compression);
+	UART_Log(tmp_txt);
+	sprintf(tmp_txt, "Channels num: %d", channelsNum);
+	UART_Log(tmp_txt);
+	sprintf(tmp_txt, "Sample rate: %d", sampleRate);
+	UART_Log(tmp_txt);
+	sprintf(tmp_txt, "Bytes per second: %d", bytesPerSecond);
+	UART_Log(tmp_txt);
+	sprintf(tmp_txt, "Bytes per sample: %d", bytesPerSample);
+	UART_Log(tmp_txt);
+	sprintf(tmp_txt, "Bits per sample per channel: %d", bitsPerSamplePerChannel);
+	UART_Log(tmp_txt);
+	sprintf(tmp_txt, "Data size: %d", dataSize);
+	UART_Log(tmp_txt);
+	UART_Log("------------------");
+	
+	if(headerSizeLeft != 16) {
+		UART_Log("Wrong `headerSizeLeft` value, 16 expected");
+		f_close(&fil);
+		return -6;
+	}
+
+	if(compression != 1) {
+		UART_Log("Wrong `compression` value, 1 expected");
+		f_close(&fil);
+		return -7;
+	}
+
+	if(channelsNum != 2) {
+		UART_Log("Wrong `channelsNum` value, 2 expected");
+		f_close(&fil);
+		return -8;
+	}
+
+	if((sampleRate != 44100) || (bytesPerSample != 4) || (bitsPerSamplePerChannel != 16) || (bytesPerSecond != 44100*2*2) || (dataSize < sizeof(signal_buff1) + sizeof(signal_buff2))) {
+		UART_Log("Wrong file format, 16 bit file with sample rate 44100 expected");
+		f_close(&fil);
+		return -9;
+	}
+	
+	fres = f_read(&fil, (uint8_t*)signal_buff1, sizeof(signal_buff1), &bytesRead);
+	if(fres != FR_OK) {
+		sprintf(tmp_txt, "f_read() failed, res = %d", fres);
+		UART_Log(tmp_txt);
+		f_close(&fil);
+		return -10;
+	}
+	
+	fres = f_read(&fil, (uint8_t*)signal_buff2, sizeof(signal_buff2), &bytesRead);
+	if(fres != FR_OK) {
+		sprintf(tmp_txt, "f_read() failed, res = %d", fres);
+		UART_Log(tmp_txt);
+		f_close(&fil);
+		return -11;
+	}
+	
+	read_next_chunk = false;
+  end_of_file_reached = false;
+  signal_play_buff = signal_buff1;
+  signal_read_buff = signal_buff2;
+	
+	int nsamples = sizeof(signal_buff1) / sizeof(signal_buff1[0]);
+
+	hal_res = HAL_I2S_Transmit_IT(&hi2s2, (uint16_t*)signal_buff1, nsamples);
+	
+	if(hal_res != HAL_OK) {
+		sprintf(tmp_txt, "I2S - HAL_I2S_Transmit failed, hal_res = %d!", hal_res);
+		UART_Log(tmp_txt);
+		f_close(&fil);
+		return -12;
+	}
+	
+	return 0;
+}
+
+int playMusic() {
+	if (dataSize >= sizeof(signal_buff1)) {
+		if(!read_next_chunk) {
+			return 0;
+		}
+		
+		read_next_chunk = false;
+		
+		fres = f_read(&fil, (uint8_t*)signal_read_buff, sizeof(signal_buff1), &bytesRead);
+		if(fres != FR_OK) {
+			sprintf(tmp_txt, "f_read() failed, res = %d\r\n", fres);
+			UART_Log(tmp_txt);
+			f_close(&fil);
+			return -13;
+		}
+		
+		dataSize -= sizeof(signal_buff1);
+	}
+	else if(!end_of_file_reached) {
+		end_of_file_reached = true;
+		
+		fres = f_close(&fil);
+		if(fres == FR_OK) {
+			UART_Log("end music and close file complete.");
+		}
+		else if(fres != FR_OK) {
+			sprintf(tmp_txt, "f_close() failed, res = %d\r\n", fres);
+			UART_Log(tmp_txt);
+			return -14;
+		}
+	}
+}
+
+
+
 /* INIT FUNCTION  ------------------------------------------*/
 
 
 void Device_Init(){
 	while (MPU6050_Init(&hi2c1) == 1);
+	initSDCARD();
 }
 
 /* FUNCTIONS  ---------------------------------------------*/
@@ -113,20 +341,24 @@ void updateStopwatch(){
 	}
 }
 
+void Music_FunctionLoop(){
+	if(deviceParamsPtr -> Music.status == active) playMusic();
+}
+
 void Music_Load(){
-	sprintf(deviceParamsPtr -> Music.songName,"Hello Test 1234");
+	sprintf(deviceParamsPtr -> Music.songName,"%d.wav",deviceParamsPtr -> Music.currentSong);
+	initWavFile(deviceParamsPtr -> Music.songName);
 }
 
 void Music_Play(){
-	// TODO: Play Music Algorithm
-	if(deviceParamsPtr -> Music.status == inactive) Music_Load(); // Maybe?
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
 	
+	if(deviceParamsPtr -> Music.status == inactive) Music_Load();
 	deviceParamsPtr -> Music.status = active;
 }
 
 void Music_Pause(){
-	// TODO: Pause Music Algorithm
-	
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET);
 	
 	deviceParamsPtr -> Music.status = pause;
 }
@@ -139,13 +371,20 @@ void Music_Stop(){
 }
 
 void Music_Next(){
-	
-	
+	deviceParamsPtr -> Music.currentSong++;
+	f_close(&fil);
+	signal_play_buff = NULL;
+	signal_read_buff = NULL;
+	for(int i = 0;i < 4096;++i){
+		signal_buff1[i] = signal_buff2[i] = 0;
+	}
+	Music_Load();
 }
 
 void Music_Prev(){
-	
-	
+	if(deviceParamsPtr -> Music.currentSong > 0) deviceParamsPtr -> Music.currentSong--;
+	f_close(&fil);
+	Music_Load();
 }
 
 void Accelerometer_Read(){
@@ -158,12 +397,17 @@ void Accelerometer_Read(){
 void checkAutoSleepWake(){
 	Accelerometer_Read();
 	if(deviceParamsPtr -> isIdle && deviceParamsPtr -> Accelerometer.KalmanAngleX >= 50){
-		UART_Log("Wake");
+		//UART_Log("Wake");
 		deviceParamsPtr -> isIdle = 0;
 	}
 	else if(!(deviceParamsPtr -> isIdle) && deviceParamsPtr -> Accelerometer.KalmanAngleX <= 30){
-		UART_Log("Sleep");
+		//UART_Log("Sleep");
 		deviceParamsPtr -> isIdle = 1;
 	}
 	deviceParamsPtr -> isIdle = 0; // Test Only
 }
+
+
+
+
+
