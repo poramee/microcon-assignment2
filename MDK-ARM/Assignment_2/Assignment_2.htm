@@ -3,7 +3,7 @@
 <title>Static Call Graph - [Assignment_2\Assignment_2.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image Assignment_2\Assignment_2.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Thu May 27 02:07:51 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Thu May 27 10:31:34 2021
 <BR><P>
 <H3>Maximum Stack Usage =        688 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1970,7 +1970,7 @@ Global Symbols
 <LI><a href="#[149]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playMusic
 </UL>
 
-<P><STRONG><a name="[151]"></a>Music_Page</STRONG> (Thumb, 424 bytes, Stack size 136 bytes, display.o(i.Music_Page))
+<P><STRONG><a name="[151]"></a>Music_Page</STRONG> (Thumb, 456 bytes, Stack size 136 bytes, display.o(i.Music_Page))
 <BR><BR>[Stack]<UL><LI>Max Depth = 680<LI>Call Chain = Music_Page &rArr; Music_Prev &rArr; Music_Play &rArr; Music_Load &rArr; Music_LoadSongNames &rArr; f_open &rArr; dir_register &rArr; dir_find &rArr; dir_next &rArr; create_chain &rArr; put_fat &rArr; move_window &rArr; sync_window &rArr; disk_write
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ILI9341_Draw_Text
@@ -2338,8 +2338,8 @@ Global Symbols
 <P><STRONG><a name="[bf]"></a>UART_Log</STRONG> (Thumb, 42 bytes, Stack size 16 bytes, device.o(i.UART_Log))
 <BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = UART_Log &rArr; HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
 </UL>
-<BR>[Calls]<UL><LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;strlen
-<LI><a href="#[120]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit
+<BR>[Calls]<UL><LI><a href="#[120]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit
+<LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;strlen
 </UL>
 <BR>[Called By]<UL><LI><a href="#[149]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;playMusic
 <LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initWavFile

@@ -727,11 +727,6 @@ void Music_Page(){
 		ILI9341_Draw_Text(songNameLine[0], 35, 80, Color.foreground, 3 , Color.background);
 		ILI9341_Draw_Text(songNameLine[1], 35, 110, Color.foreground, 2 , Color.background);
 		
-		//int playButtonX = 106 - (deviceParamsPtr -> Music.status == active? 9: 0);
-		//Draw_Button(playButtonX,150,(deviceParamsPtr -> Music.status == active? "PAUSE": "PLAY"), 3, WHITE, Color.accent, &targetRect[1]);
-		//Draw_Button(38,158,"<<", 2, WHITE, BLACK, &targetRect[2]);
-		//Draw_Button(234,158,">>", 2, WHITE, BLACK, &targetRect[3]);
-		
 		if(deviceParamsPtr -> Music.status == active) Draw_PauseButton(135,170,50,50,20,Color.accent,&targetRect[1]);
 		else Draw_Triangle(135,170,50,50,Color.accent,&targetRect[1]);
 		Draw_PrevSongButton(57,180,Color.foreground,&targetRect[2]);
@@ -760,8 +755,7 @@ void Music_Page(){
 			updateScreen();
 			break;
 		default:
-			if(deviceParamsPtr -> Music.status == inactive && prevCurrentSong != -1){
-				prevCurrentSong = -1;
+			if((deviceParamsPtr -> Music.status == active && prevCurrentSong != deviceParamsPtr -> Music.currentSong) || ((deviceParamsPtr -> Music.status == inactive || deviceParamsPtr -> Music.status == pause) && prevCurrentSong != -1)){
 				updateScreen();
 			}
 			break;
